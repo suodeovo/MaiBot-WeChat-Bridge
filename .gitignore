@@ -38,3 +38,4 @@ tests/.pytest_cache/
 # 构建产物
 *.egg-info/
 build/
+/runtime/installers/

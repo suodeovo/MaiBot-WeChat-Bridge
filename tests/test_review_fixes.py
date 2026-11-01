@@ -65,7 +65,7 @@ class R1RealSse(unittest.IsolatedAsyncioTestCase):
                 b'data: {"n": 2}\n\n', b"data: broken\n\n",
             ])
             await consumer.start()
-            await asyncio.wait_for(_wait_true(lambda: consumer.received >= 2),
+            await asyncio.wait_for(_wait_true(lambda: consumer.received >= 2 and len(seen) >= 2),
                                    timeout=5)
             self.assertEqual(seen, [{"n": 1}, {"n": 2}],
                              "坏数据跳过、心跳跳过、合法数据回调")

@@ -1,0 +1,7 @@
+# 安装到 reader 使用的解释器；不替换 MaiBot 自己的依赖环境。
+sqlcipher3==0.6.2
+cryptography==50.0.2
+zstandard==0.25.0
+pycryptodome==3.23.0
+Pillow==12.3.0
+imageio-ffmpeg==0.6.0

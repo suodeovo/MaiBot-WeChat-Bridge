@@ -21,6 +21,7 @@ import json
 import logging
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Any, ClassVar, Mapping
 
 from .config import WxSupervisorSettings
@@ -38,6 +39,7 @@ from .config_service import PluginConfigService
 from .admin import AdminCommandsMixin
 from . import perf
 from . import send_queue
+from .runtime_check import check_managed_reader
 
 log = logging.getLogger('wxsupervisor')
 
@@ -162,8 +164,7 @@ class WxSupervisorPlugin(AdminCommandsMixin, MaiBotPlugin):
 
         settings = self._settings()
         if not settings.validate_runtime(log):
-            log.error('配置校验未通过，插件不启动')
-            return
+            raise RuntimeError('WX_CONFIG_INVALID: 配置校验未通过，详见前述错误与 INSTALL.md')
 
         self.cfg = self._load_config()
         if not self.cfg.get('enabled', True):
@@ -175,8 +176,12 @@ class WxSupervisorPlugin(AdminCommandsMixin, MaiBotPlugin):
 
         root = str(self.cfg.get('project_root') or '')
         if not root or not Path(root).is_dir():
-            log.error('project_root 无效: %r', root)
-            return
+            raise RuntimeError('PROJECT_ROOT_MISSING: 请先安装 WeChatAgent 并正确填写 project.root；见 runtime/README.md')
+
+        if self.cfg.get('autostart_reader', True):
+            errors = await asyncio.to_thread(check_managed_reader, root, self.cfg['python'])
+            if errors:
+                raise RuntimeError('\n'.join(errors))
 
         self.supervisor = ProcessSupervisor(root)
         self.hook = HookNative(self.cfg['hook_base_url'], self._hook_token())
@@ -190,7 +195,8 @@ class WxSupervisorPlugin(AdminCommandsMixin, MaiBotPlugin):
 
         # 1) 托管 reader
         if self.cfg.get('autostart_reader', True):
-            await self._ensure_reader()
+            if not await self._ensure_reader():
+                raise RuntimeError('READER_START_FAILED: reader 启动失败，请检查 reader 日志与 runtime/README.md')
 
         # 2) hook 健康检查（不代登录，只提示）
         await self._check_hook(warn_only=True)
@@ -1224,7 +1230,7 @@ class WxSupervisorPlugin(AdminCommandsMixin, MaiBotPlugin):
             args=[str(script)],
             cwd=str(root),
             marker=str(script),
-            port=5031,
+            port=urlsplit(self.cfg['reader_base_url']).port or 80,
             env={'PYTHONUTF8': '1', 'PYTHONUNBUFFERED': '1'},
         )
 

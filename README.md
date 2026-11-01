@@ -26,19 +26,22 @@ MaiBot 主链路使用插件网关。OneBot WebSocket 服务供外部客户端�
 
 ## 运行环境
 
-当前适配 MaiBot **1.3.19**，插件版本 **1.4.1**。兼容范围收窄为 MaiBot **1.3.16–1.3.19**。
+当前适配 MaiBot **1.3.19**，插件版本 **1.4.2**。兼容范围为 MaiBot **1.3.16–1.3.19**。
+
+**首次安装必须先准备 WeChatAgent 运行环境。** 插件本身不能替代数据库读取器、微信 hook 和本机账号配置。1.4.2 完整包已加入匹配的 WeChatAgent 安装器，源码/市场安装提供固定版本下载脚本，见 [运行环境安装](runtime/README.md)。
 
 | 组件 | 版本 |
 | --- | --- |
 | 操作系统 | Windows |
+| WeChatAgent | 0.4.1，必装；完整包附安装器，内含 reader 模块和独立 Python 运行环境 |
 | MaiBot | 1.3.19；兼容范围 1.3.16–1.3.19 |
 | maibot-plugin-sdk | 1.3.19 配套使用 2.20.0–2.21.0；旧环境保留 2.16.0 兼容 |
-| Python | 3.12.x |
+| Python | MaiBot 使用 3.12.x；reader 使用 WeChatAgent 安装器配置的独立解释器 |
 | 微信客户端 | 4.1.10.27，完整包已附带匹配客户端及 hook DLL |
 
-完整包已附带匹配的微信客户端及 hook 文件，存放于 `runtime/`，使用方法见 [客户端部署说明](runtime/README.md)。若仅下载源码包，需另行准备这些运行时文件。
+完整包同时附带 WeChatAgent 0.4.1 原始安装器、匹配的微信客户端及 hook 文件，存放于 `runtime/`。市场安装和源码包不携带大型二进制，可运行 `tools/download-runtime.ps1` 下载并校验匹配安装器。
 
-两种包都需要可用的 WeChatAgent、reader 运行环境及本机配置；微信账号需在目标机器自行登录。
+先安装 WeChatAgent，并在其界面完成目标机器的微信登录和数据库连接验证；账号凭据由目标机器生成，不随任何发布包分发。
 
 1.3.19 适配验证覆盖官方清单校验、插件入口加载、组件注册及 SDK 2.20.0 / 2.21.0 隔离回归；不代表已在该版本完成真实微信收发验收。详见 [版本兼容说明](docs/COMPATIBILITY.md)。
 
@@ -58,18 +61,17 @@ python -m pip install "websockets>=12.0" "pydantic>=2.0"
 | `pilk` | 将 PCM/WAV 音频编码为微信使用的 SILK |
 | `pycryptodome` | 图片本地降级解码 |
 
-基础消息收发无需安装语音合成插件。reader 和 hook 自身的依赖按对应项目要求配置。
+基础消息收发无需安装语音合成插件。reader 必需 `sqlcipher3`、`cryptography`、`zstandard`、`pycryptodome`、`Pillow` 和 `imageio-ffmpeg`，由匹配安装器的独立 Python 提供，修复清单见 [reader 依赖](runtime/reader-requirements.txt)。这些包应装入 reader 的解释器环境。
 
 ## 安装
 
-1. 备份原有 reader 脚本；更新已有安装时，先暂停桥接插件和 reader，并备份插件、配置及运行状态。
-2. 使用完整包时，先按 [客户端部署说明](runtime/README.md) 放置微信客户端和 hook 文件，并在目标机器初始化认证；已有匹配环境可跳过。
-3. **先部署 reader 补丁**：将 `patches/reader-api.cursor-patch.py` 替换到 WeChatAgent 的 `scripts/reader-api.py`，重新启动 reader。
-4. **再安装插件**：从插件市场安装，或将本仓库全部内容放到 `MaiBot/plugins/local_wxsupervisor/`。确认该目录直接包含 `_manifest.json` 和 `plugin.py`，不要再嵌套一层插件目录。使用插件专用 ZIP 时，解压后将其中的 `local_wxsupervisor/` 放入 `plugins/`。
-5. 首次安装时，将插件目录中的 `config.toml.example` 复制为 `config.toml`，填写实际路径和连接地址。更新时保留原配置。
-6. 启动或重新加载 MaiBot，检查插件加载日志、reader 状态以及 hook 登录状态。
+1. 按 [运行环境安装](runtime/README.md) 安装 WeChatAgent 0.4.1，打开匹配微信 4.1.10.27，在目标机器完成账号连接和数据库验证。
+2. 暂停 WeChatAgent 的聊天服务、旧 reader 和桥接插件，保留已登录微信；更新时先备份插件、配置及运行状态。
+3. 从插件市场安装，或将仓库内容放入 `MaiBot/plugins/local_wxsupervisor/`；该目录直接包含 `_manifest.json` 和 `plugin.py`。此时先保持插件停用。
+4. 在插件目录运行 `python tools/prepare-runtime.py --project-root "C:\WeChatAgent\data\workspace" --patch-reader --configure`，将示例路径替换为实际位置。工具先检查运行环境，再备份并部署 reader 补丁、填写插件路径；默认从 WeChatAgent 配置读取 reader 解释器。
+5. 启动或重新加载插件，检查 reader 和 hook 状态，再从外部账号验证真实收发。详细手工步骤见 [INSTALL.md](INSTALL.md)。
 
-reader 补丁提供断线补收所需的游标分页接口。替换脚本后，需要确认运行中的 reader 已使用新文件。
+reader 补丁提供断线补收所需的游标分页接口；需在 reader 停止时部署，重新启动后生效。缺少必需文件、解释器或账号配置时，托管启动会明确报错，避免仅显示“加载成功”却不能接收。
 
 ## 配置
 
@@ -77,8 +79,8 @@ reader 补丁提供断线补收所需的游标分页接口。替换脚本后，�
 
 | 配置项 | 说明 |
 | --- | --- |
-| `project.root` | WeChatAgent 项目目录，包含 `scripts/reader-api.py` |
-| `project.python` | 运行 reader 的 Python 解释器路径 |
+| `project.root` | 已安装实例的 `data/workspace`，包含全部 reader 模块 |
+| `project.python` | WeChatAgent 内置、已安装 reader 依赖的 Python；可由准备工具自动填写 |
 | `reader.base_url` | reader 地址，默认 `http://127.0.0.1:5031` |
 | `hook.base_url` | hook 地址，默认 `http://127.0.0.1:30001` |
 | `wechat.whitelist_groups` | 群聊白名单，留空表示不限制 |
@@ -87,7 +89,7 @@ reader 补丁提供断线补收所需的游标分页接口。替换脚本后，�
 | `limits` | 发送间隔、额度和等待时间 |
 | `server.enable` | 是否启用 OneBot 服务，默认端口为 `7999` |
 
-配置示例中的路径和身份占位符需替换为实际值。可通过配置文件或 MaiBot 插件配置页调整参数。
+配置示例中的路径和身份占位符需替换为实际值。可通过配置文件或 MaiBot 插件配置页调整参数。MaiBot 主链路不依赖 OneBot 服务；不连接外部 OneBot 客户端时可关闭 `server.enable`，启用时检查默认 `7999` 端口是否空闲。
 
 ## 语音功能
 
@@ -141,11 +143,11 @@ python -m unittest discover -s tests -v
 
 - **插件包**：可直接放入 MaiBot `plugins/` 的 `local_wxsupervisor/` 目录，包含插件及安装说明。
 - **源码包**：插件源码、reader 补丁、文档与测试，适合提交到 GitHub 仓库。
-- **含客户端完整包**：在源码包基础上增加 `runtime/wechat-4.1.10.27/` 和 `runtime/native/`，适合作为 GitHub Release 附件分发。
+- **完整包**：源码、WeChatAgent 0.4.1 原始安装器、微信 4.1.10.27 和配套 hook。运行安装器后再初始化本机账号配置。
 
-完整包不携带本机认证文件、聊天记录或生产配置。WeChatAgent 的其余运行环境仍需单独准备。
+完整包不携带本机认证文件、聊天记录或生产配置。安装器和客户端较大，作为 GitHub Release 附件分发。
 
-插件市场安装的是插件源码，不会自动部署微信客户端、hook 或外部 reader 补丁；首次使用仍需完成上方安装步骤。
+插件市场安装的是插件源码；其中的下载和准备工具用于完成上述前置安装，不能跳过本机微信登录与账号验证。
 
 ## 来源与许可
 

@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "plugin_type": "adapter",
   "name": "微信链路统一托管",
   "description": "把 WeChatAgent 的 reader-api 与微信 hook 收拢到统一收发链路：发送走 hook 原生 HTTP（不模拟键盘、不抢前台），接收走 reader SSE。含进程守护、统一身份策略、发送调度与断线补收。",

@@ -52,6 +52,8 @@ This project incorporates or depends on the following third-party components:
 
 ## Bundled runtime (full package only)
 
+- **WeChatAgent installer**: the unmodified 0.4.1 Windows x64 installer from [the upstream release](https://github.com/sourcepro5/WeChatAgent/releases/tag/v0.4.1), verified against its published SHA-256. Its own code and bundled components retain their original terms; a copy of the upstream project notice is in [runtime/WeChatAgent-LICENSE.txt](runtime/WeChatAgent-LICENSE.txt). The bridge GPL license does not relicense the installer or its third-party contents.
+
 - **WeChat client**: Tencent Weixin 4.1.10.27, including its executable and runtime dependencies.
 - **Hook component**: the matching WeChatAgent `version.dll`; the full package includes sanitized version/hash metadata.
 - **Distribution**: included in the full package under `runtime/`, separate from the source-only archive.
