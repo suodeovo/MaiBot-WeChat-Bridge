@@ -1,0 +1,53 @@
+# Third-Party Licenses
+
+This project incorporates or depends on the following third-party components:
+
+## MaiBot Plugin SDK
+
+- **Version**: 2.16.0
+- **License**: LGPL-3.0-only
+- **Source**: https://github.com/Mai-with-u/maibot-plugin-sdk
+- **Usage**: Plugin base classes, component decorators, configuration model
+
+## websockets
+
+- **Version**: >= 12.0
+- **License**: BSD-3-Clause
+- **Source**: https://github.com/aaugustin/websockets
+- **Usage**: OneBot WebSocket server
+
+## pydantic
+
+- **Version**: >= 2.0
+- **License**: MIT
+- **Source**: https://github.com/pydantic/pydantic
+- **Usage**: Configuration model validation
+
+## pilk (optional)
+
+- **Version**: 0.2.4
+- **License**: GPL-3.0
+- **Source**: https://github.com/foyoux/pilk
+- **Usage**: SILK audio codec for voice synthesis
+
+## pycryptodome (optional)
+
+- **Version**: >= 3.0
+- **License**: BSD-3-Clause / Public Domain
+- **Source**: https://github.com/Legrandin/pycryptodome
+- **Usage**: AES decryption for image fallback decoding
+
+## MaiBot core (upstream, not bundled)
+
+- **Version**: 1.3.16
+- **License**: AGPL-3.0 (default) + Special GPL License Grant for plugin ecosystem
+- **Source**: https://github.com/Mai-with-u/MaiBot
+- **Note**: This plugin interacts via RPC as a separate process
+
+## Bundled runtime (full package only)
+
+- **WeChat client**: Tencent Weixin 4.1.10.27, including its executable and runtime dependencies.
+- **Hook component**: the matching WeChatAgent `version.dll`; the full package includes sanitized version/hash metadata.
+- **Distribution**: included in the full package under `runtime/`, separate from the source-only archive.
+- **Notices**: original third-party copyright and license terms remain applicable. This project's license does not relicense these binaries.
+- **Privacy**: machine-specific tokens, login data, chat databases, logs and old DLL backups are excluded.

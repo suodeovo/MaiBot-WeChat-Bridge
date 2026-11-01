@@ -1,0 +1,54 @@
+{
+  "manifest_version": 2,
+  "version": "1.4.0",
+  "plugin_type": "adapter",
+  "name": "微信链路统一托管",
+  "description": "把 WeChatAgent 的 reader-api 与微信 hook 收拢到统一收发链路：发送走 hook 原生 HTTP（不模拟键盘、不抢前台），接收走 reader SSE。含进程守护、统一身份策略、发送调度与断线补收。",
+  "author": {
+    "name": "local",
+    "url": "https://github.com/suodeovo"
+  },
+  "license": "GPL-3.0-or-later",
+  "urls": {
+    "repository": "https://github.com/suodeovo/MaiBot-WeChat-Bridge",
+    "homepage": "https://github.com/suodeovo/MaiBot-WeChat-Bridge",
+    "documentation": "https://github.com/suodeovo/MaiBot-WeChat-Bridge/blob/main/README.md",
+    "issues": "https://github.com/suodeovo/MaiBot-WeChat-Bridge/issues"
+  },
+  "host_application": {
+    "min_version": "1.0.0",
+    "max_version": "1.99.99"
+  },
+  "sdk": {
+    "min_version": "2.7.0",
+    "max_version": "2.99.99"
+  },
+  "dependencies": [
+    {
+      "type": "python_package",
+      "name": "websockets",
+      "version_spec": ">=12.0"
+    },
+    {
+      "type": "python_package",
+      "name": "pydantic",
+      "version_spec": ">=2.0"
+    }
+  ],
+  "capabilities": [
+    "gateway.route_message",
+    "gateway.update_state",
+    "api.call"
+  ],
+  "i18n": {
+    "default_locale": "zh-CN",
+    "supported_locales": [
+      "zh-CN"
+    ]
+  },
+  "id": "local.wxsupervisor",
+  "credits": {
+    "upstream": "https://github.com/jessiongod/mai-bot-wechat-adapter",
+    "note": "Based on the WeChatAgent hook architecture and MaiBot plugin SDK"
+  }
+}

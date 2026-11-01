@@ -1,0 +1,40 @@
+# 生产配置和凭据
+local_wxsupervisor/config.toml
+*.toml
+!local_wxsupervisor/config.toml.example
+
+# 运行状态和缓存
+state/
+*.lock
+__pycache__/
+*.pyc
+*.pyo
+
+# 私人数据和媒体
+*.db
+*.db-wal
+*.db-shm
+*.log
+xwechat_files/
+
+# 备份和临时文件
+*.bak
+*.tmp
+*.orig
+dist/
+backups/
+
+# IDE 和虚拟环境
+.idea/
+.vscode/
+venv/
+.venv/
+env/
+
+# 测试临时文件
+tests/__pycache__/
+tests/.pytest_cache/
+
+# 构建产物
+*.egg-info/
+build/

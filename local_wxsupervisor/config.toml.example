@@ -1,0 +1,120 @@
+# 微信链路统一托管插件配置
+#
+# 发送走 hook 原生 HTTP（/SendTextMsg）：不模拟键盘、不抢前台、窗口可最小化。
+# 接收走 reader 的 SSE，转 OneBot v11 事件并投递给 MaiBot 网关。
+#
+# 这些字段在 MaiBot WebUI 的插件配置页里也能改，结构对齐 WeChatAgent。
+config_version = "1.0.0"
+
+[plugin]
+enabled = true
+auto_start = true
+# MaiBot 要求版本号必须在 [plugin] 节内，缺了会「仅加载配置管理」
+config_version = "1.0.0"
+
+[project]
+# WeChatAgent 项目根（scripts/reader-api.py 在这里）
+root = "C:\\path\\to\\wechatagent"
+# 运行 reader-api.py 的 python
+python = "C:\\path\\to\\python\\python.exe"
+media_ttl_hours = 48.0
+media_max_mb = 512.0
+media_workers = 4
+pilk_paths = "C:\\path\\to\\wechatagent\\packages\\dsh-wechat-voice\\runtime\\py312\\Lib\\site-packages"
+crypto_paths = "C:\\path\\to\\crypto\\site-packages"
+media_scripts_dir = "C:\\path\\to\\wechatagent\\scripts"
+
+[reader]
+base_url = "http://127.0.0.1:5031"
+autostart = true
+stop_on_unload = true
+watchdog = true
+watchdog_seconds = 15.0
+
+[hook]
+base_url = "http://127.0.0.1:30001"
+expected_version = "4.1.10.27"
+wechat_executable = "state/hook/wechat-4.1.10.27/Weixin.exe"
+request_timeout_ms = 5000
+receipt_timeout_ms = 18000
+max_concurrent_sends = 4
+
+[launcher]
+# 把 action 改成 "open" 并保存，插件就会按 exe 拉起对应版本微信，
+# 执行完自动复位成 "idle"（不会反复触发）。
+# 如果启动时提示 "hook 已就绪，无需启动"，把这里手动改回 "idle" 即可，
+# 避免每次改配置都白跑一遍启动流程。
+action = "idle"
+exe = "state/hook/wechat-4.1.10.27/Weixin.exe"
+wait_seconds = 40.0
+allow_other_versions = false
+last_result = ""
+
+[server]
+# 本插件的 OneBot v11 服务端（给外部客户端/调试用；MaiBot 走网关不依赖它）
+enable = true
+host = "127.0.0.1"
+port = 7999
+token = ""
+
+[wechat]
+# 逗号分隔；留空表示不限制
+whitelist_groups = ""
+whitelist_private = ""
+# hybrid = 自然参与；mention = 仅被 @ 或唤醒词时回复
+wake_mode = "hybrid"
+wake_words = "小柚"
+max_reply_messages = 2
+
+administrators = "wxid_your_admin_wxid"
+
+[limits]
+batch_ms = 3000
+# 跨轮：群聊两次回复之间至少隔多久
+min_interval_ms = 15000
+private_min_interval_ms = 1000
+max_per_minute = 20
+max_per_ten_minutes = 100
+# 一轮回复的最长持续时间。TTS 合成一条要 3~6 秒，三段回复能横跨 20 秒以上，
+# 所以要留足，否则后面的段会被误判成新一轮。
+round_window_ms = 30000
+# 与上一条间隔超过这个值就视为新一轮
+turn_quiet_ms = 10000
+# 同一轮内两条之间的物理最小间隔，防瞬间刷屏
+round_min_gap_ms = 200
+# 为满足发送间隔最多等这么久，超过直接拒绝（避免堵死发送队列）
+max_wait_ms = 8000
+
+[tts]
+# 用 MaiBot 的豆包语音合成 2.0 插件（local.volc.tts2）合成微信语音
+# 链路：文本 → volc_tts 的 public API「synthesize」→ PCM/WAV
+#      → pilk 编码 SILK → hook /WeChatAgent/voice-send
+enabled = true
+# text_only 只发文字（默认）：语音完全交给模型按需触发
+#   —— 模型想说话时自己调 volc_tts 的 volc_tts_speak 工具，
+#      那条语音段会经网关进来，由插件直接发出去。
+# on_request     用户明确要求「发语音/念出来」才把回复转成语音
+# both           每条都发文字+语音
+# voice_only     每条只发语音
+# voice_if_short 短文本发语音
+mode = "text_only"
+# 语音没发成功（合成失败/被拒/限流）时自动补发文字，避免整条回复消失
+voice_fallback_text = true
+# on_request 模式：命中这些词才转语音（逗号分隔）
+request_triggers = "发语音,语音说,说语音,念出来,念一下,读一下,读给我,说给我听,用声音,语音回复,发条语音,来段语音"
+# on_request 模式：命中这些词就不转语音，优先级高于请求词
+request_negative = "别发语音,不要语音,别念,不用语音,打字就行,别语音"
+# 「用户要求语音」的有效期（秒），过期不再生效
+request_window_s = 120.0
+# on_request 模式下，转语音时是否同时发一遍文字
+keep_text = false
+# 超过这个字数不合成语音，保持文字
+max_chars = 120
+# voice_if_short 模式下，短于该字数才发语音
+short_chars = 60
+# 音色 ID，留空用 volc_tts 插件自己配的音色
+speaker = ""
+# PCM 采样率，需与 volc_tts 的 tts.sample_rate 一致
+sample_rate = 24000
+# 语音发送遇到 hook 的 HTTP 429 限流时的重试总预算（毫秒）
+retry_budget_ms = 12000
