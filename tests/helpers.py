@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import ast
 import hashlib
+import importlib.util
 import json
 import sys
 import threading
@@ -18,9 +19,19 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
-SOURCE_DIR = Path(__file__).resolve().parent.parent / "source"
-if str(SOURCE_DIR) not in sys.path:
-    sys.path.insert(0, str(SOURCE_DIR))
+REPOSITORY_DIR = Path(__file__).resolve().parent.parent
+SOURCE_DIR = REPOSITORY_DIR / "source"
+
+# 市场仓库的插件入口位于根目录；测试使用固定包名加载，避免依赖克隆目录名。
+if "local_wxsupervisor" not in sys.modules:
+    spec = importlib.util.spec_from_file_location(
+        "local_wxsupervisor", REPOSITORY_DIR / "__init__.py",
+        submodule_search_locations=[str(REPOSITORY_DIR)],
+    )
+    assert spec is not None and spec.loader is not None
+    package = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = package
+    spec.loader.exec_module(package)
 
 READER_API = SOURCE_DIR / "reader" / "reader-api.py"
 

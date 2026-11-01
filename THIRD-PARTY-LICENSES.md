@@ -4,7 +4,7 @@ This project incorporates or depends on the following third-party components:
 
 ## MaiBot Plugin SDK
 
-- **Version**: 2.16.0
+- **Versions checked**: 2.16.0, 2.20.0 and 2.21.0
 - **License**: LGPL-3.0-only
 - **Source**: https://github.com/Mai-with-u/maibot-plugin-sdk
 - **Usage**: Plugin base classes, component decorators, configuration model
@@ -39,10 +39,16 @@ This project incorporates or depends on the following third-party components:
 
 ## MaiBot core (upstream, not bundled)
 
-- **Version**: 1.3.16
+- **Compatibility range**: 1.3.16–1.3.19; 1.3.19 checked with SDK 2.20.0 in isolation
 - **License**: AGPL-3.0 (default) + Special GPL License Grant for plugin ecosystem
 - **Source**: https://github.com/Mai-with-u/MaiBot
 - **Note**: This plugin interacts via RPC as a separate process
+
+## Adapter reference
+
+- **Source**: https://github.com/jessiongod/mai-bot-wechat-adapter
+- **License declared by upstream**: GPL-3.0-or-later
+- **Note**: Attribution previously stored in the nonstandard manifest `credits` field is retained here; the field is removed for strict Host manifest validation.
 
 ## Bundled runtime (full package only)
 

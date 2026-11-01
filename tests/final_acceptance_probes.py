@@ -16,8 +16,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-sys.path.insert(0, r".\source")
-sys.path.insert(0, r".\tests")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.stdout.reconfigure(line_buffering=True)
 logging.disable(logging.CRITICAL)
 
@@ -133,7 +132,7 @@ async def main():
 
     print('== enter 7', file=sys.stderr);    # ---- 7 same_rawid_staged_as_failure_then_accepted_again_after_host_ttl
     spec = importlib.util.spec_from_file_location(
-        "host_dedupe", Path(pathlib.Path(__file__).parent.parent / "tests" / "mock_host_dedupe.py"))
+        "host_dedupe", Path(__file__).resolve().parent / "mock_host_dedupe.py")
     host_dedupe = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(host_dedupe)
     clock = [1000.0]
@@ -327,8 +326,13 @@ async def main():
            group_name=payload.get("groupName") if payload else None)
 
 
-threading.Timer(15.0, lambda: faulthandler.dump_traceback()).start()
-asyncio.run(main())
+watchdog = threading.Timer(15.0, faulthandler.dump_traceback)
+watchdog.daemon = True
+watchdog.start()
+try:
+    asyncio.run(main())
+finally:
+    watchdog.cancel()
 print(json.dumps(results, ensure_ascii=False, indent=1))
 # V2 复核：逐项断言，任一失败返回非零退出码；进程正常退出（收尾纳入验收）
 failures = [r for r in results if not r["fixed"]]

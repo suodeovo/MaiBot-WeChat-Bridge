@@ -1,7 +1,7 @@
 # 生产配置和凭据
-local_wxsupervisor/config.toml
+/config.toml
 *.toml
-!local_wxsupervisor/config.toml.example
+!config.toml.example
 
 # 运行状态和缓存
 state/

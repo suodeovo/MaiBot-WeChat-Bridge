@@ -26,19 +26,21 @@ MaiBot 主链路使用插件网关。OneBot WebSocket 服务供外部客户端�
 
 ## 运行环境
 
-当前参考环境：
+当前适配 MaiBot **1.3.19**，插件版本 **1.4.1**。兼容范围收窄为 MaiBot **1.3.16–1.3.19**。
 
 | 组件 | 版本 |
 | --- | --- |
 | 操作系统 | Windows |
-| MaiBot | 1.3.16 |
-| maibot-plugin-sdk | 2.16.0 |
+| MaiBot | 1.3.19；兼容范围 1.3.16–1.3.19 |
+| maibot-plugin-sdk | 1.3.19 配套使用 2.20.0–2.21.0；旧环境保留 2.16.0 兼容 |
 | Python | 3.12.x |
 | 微信客户端 | 4.1.10.27，完整包已附带匹配客户端及 hook DLL |
 
 完整包已附带匹配的微信客户端及 hook 文件，存放于 `runtime/`，使用方法见 [客户端部署说明](runtime/README.md)。若仅下载源码包，需另行准备这些运行时文件。
 
 两种包都需要可用的 WeChatAgent、reader 运行环境及本机配置；微信账号需在目标机器自行登录。
+
+1.3.19 适配验证覆盖官方清单校验、插件入口加载、组件注册及 SDK 2.20.0 / 2.21.0 隔离回归；不代表已在该版本完成真实微信收发验收。详见 [版本兼容说明](docs/COMPATIBILITY.md)。
 
 ### 插件依赖
 
@@ -63,7 +65,7 @@ python -m pip install "websockets>=12.0" "pydantic>=2.0"
 1. 备份原有 reader 脚本；更新已有安装时，先暂停桥接插件和 reader，并备份插件、配置及运行状态。
 2. 使用完整包时，先按 [客户端部署说明](runtime/README.md) 放置微信客户端和 hook 文件，并在目标机器初始化认证；已有匹配环境可跳过。
 3. **先部署 reader 补丁**：将 `patches/reader-api.cursor-patch.py` 替换到 WeChatAgent 的 `scripts/reader-api.py`，重新启动 reader。
-4. **再安装插件**：将 `local_wxsupervisor/` 整个目录复制到 MaiBot 的 `plugins/` 下。
+4. **再安装插件**：从插件市场安装，或将本仓库全部内容放到 `MaiBot/plugins/local_wxsupervisor/`。确认该目录直接包含 `_manifest.json` 和 `plugin.py`，不要再嵌套一层插件目录。使用插件专用 ZIP 时，解压后将其中的 `local_wxsupervisor/` 放入 `plugins/`。
 5. 首次安装时，将插件目录中的 `config.toml.example` 复制为 `config.toml`，填写实际路径和连接地址。更新时保留原配置。
 6. 启动或重新加载 MaiBot，检查插件加载日志、reader 状态以及 hook 登录状态。
 
@@ -71,7 +73,7 @@ reader 补丁提供断线补收所需的游标分页接口。替换脚本后，�
 
 ## 配置
 
-完整字段见 [配置示例](local_wxsupervisor/config.toml.example)。首次使用优先核对以下设置：
+完整字段见 [配置示例](config.toml.example)。首次使用优先核对以下设置：
 
 | 配置项 | 说明 |
 | --- | --- |
@@ -137,10 +139,13 @@ python -m unittest discover -s tests -v
 
 ## 发布包
 
+- **插件包**：可直接放入 MaiBot `plugins/` 的 `local_wxsupervisor/` 目录，包含插件及安装说明。
 - **源码包**：插件源码、reader 补丁、文档与测试，适合提交到 GitHub 仓库。
 - **含客户端完整包**：在源码包基础上增加 `runtime/wechat-4.1.10.27/` 和 `runtime/native/`，适合作为 GitHub Release 附件分发。
 
 完整包不携带本机认证文件、聊天记录或生产配置。WeChatAgent 的其余运行环境仍需单独准备。
+
+插件市场安装的是插件源码，不会自动部署微信客户端、hook 或外部 reader 补丁；首次使用仍需完成上方安装步骤。
 
 ## 来源与许可
 
