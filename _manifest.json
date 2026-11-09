@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "version": "1.4.3",
+  "version": "1.4.4",
   "plugin_type": "adapter",
   "name": "微信链路统一托管",
-  "description": "把 WeChatAgent 的 reader-api 与微信 hook 收拢到统一收发链路：发送走 hook 原生 HTTP（不模拟键盘、不抢前台），接收走 reader SSE。含进程守护、统一身份策略、发送调度与断线补收。",
+  "description": "为 MaiBot 提供微信消息桥接。使用独立 reader 和配套微信 hook，支持进程守护、会话白名单、发送调度与断线补收。",
   "author": {
     "name": "suodeovo",
     "url": "https://github.com/suodeovo"

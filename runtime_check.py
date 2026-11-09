@@ -29,17 +29,17 @@ def check_managed_reader(root: str, python: str, *, probe_dependencies: bool = T
     base = Path(root)
     errors = []
     if not base.is_dir():
-        return ['PROJECT_ROOT_MISSING: project.root 必须指向已安装的 WeChatAgent data/workspace']
+        return ['PROJECT_ROOT_MISSING: project.root 必须指向已准备的微信桥接运行目录']
     missing = [name for name in READER_FILES if not (base / name).is_file()]
     if missing:
         errors.append('READER_FILES_MISSING: ' + ', '.join(missing)
-                      + '；请先安装 runtime/README.md 指定的 WeChatAgent 运行环境')
+                      + '；请按 runtime/README.md 准备 reader 运行环境')
     absent = [name for name in ACCOUNT_FILES if not (base / name).is_file()]
     if absent:
         errors.append('READER_ACCOUNT_NOT_CONFIGURED: ' + ', '.join(absent)
-                      + '；请在 WeChatAgent 完成本机账号连接与数据库验证')
+                      + '；请先完成本机微信账号连接与数据库验证')
     if not Path(python).is_file():
-        errors.append('READER_PYTHON_MISSING: project.python 必须指向 WeChatAgent 内置 python.exe')
+        errors.append('READER_PYTHON_MISSING: project.python 必须指向 reader 的 python.exe')
     if errors or not probe_dependencies:
         return errors
     # 使用目标解释器进行只读导入检查，不运行 Reader()，不连接数据库。
@@ -63,8 +63,8 @@ def check_managed_reader(root: str, python: str, *, probe_dependencies: bool = T
         if result.returncode or not isinstance(missing_packages, list):
             raise ValueError('Invalid probe result')
     except (OSError, ValueError, IndexError, KeyError, subprocess.TimeoutExpired):
-        return ['READER_PYTHON_UNUSABLE: 目标解释器导入检查失败；请修复 WeChatAgent 内置运行环境']
+        return ['READER_PYTHON_UNUSABLE: 目标解释器导入检查失败；请修复 reader Python 环境']
     if missing_packages:
         errors.append('READER_DEPENDENCIES_MISSING: ' + ', '.join(str(x) for x in missing_packages)
-                      + '；请修复 WeChatAgent 内置环境，或按 runtime/reader-requirements.txt 安装到该解释器')
+                      + '；请按 runtime/reader-requirements.txt 安装到该解释器')
     return errors

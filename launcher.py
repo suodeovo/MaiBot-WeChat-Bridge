@@ -101,7 +101,8 @@ def file_version(exe: Path) -> str:
     """读 exe 的 FileVersion。取不到返回空串。"""
     if not exe.is_file():
         return ''
-    cmd = (f'(Get-Item -LiteralPath {json.dumps(str(exe))}).VersionInfo.FileVersion')
+    quoted_path = "'" + str(exe).replace("'", "''") + "'"
+    cmd = f'(Get-Item -LiteralPath {quoted_path}).VersionInfo.FileVersion'
     return _run_ps(cmd, timeout=10)
 
 

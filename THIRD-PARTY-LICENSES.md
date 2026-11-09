@@ -50,12 +50,7 @@ This project incorporates or depends on the following third-party components:
 - **License declared by upstream**: GPL-3.0-or-later
 - **Note**: Attribution previously stored in the nonstandard manifest `credits` field is retained here; the field is removed for strict Host manifest validation.
 
-## Bundled runtime (full package only)
+## Reader source and runtime components
 
-- **WeChatAgent installer**: the unmodified 0.4.1 Windows x64 installer from [the upstream release](https://github.com/sourcepro5/WeChatAgent/releases/tag/v0.4.1), verified against its published SHA-256. Its own code and bundled components retain their original terms; a copy of the upstream project notice is in [runtime/WeChatAgent-LICENSE.txt](runtime/WeChatAgent-LICENSE.txt). The bridge GPL license does not relicense the installer or its third-party contents.
-
-- **WeChat client**: Tencent Weixin 4.1.10.27, including its executable and runtime dependencies.
-- **Hook component**: the matching WeChatAgent `version.dll`; the full package includes sanitized version/hash metadata.
-- **Distribution**: included in the full package under `runtime/`, separate from the source-only archive.
-- **Notices**: original third-party copyright and license terms remain applicable. This project's license does not relicense these binaries.
-- **Privacy**: machine-specific tokens, login data, chat databases, logs and old DLL backups are excluded.
+- **Reader helpers** are from the [WeChatAgent 0.4.1 source release](https://github.com/sourcepro5/WeChatAgent/tree/v0.4.1). The upstream notices are in [WeChatAgent-LICENSE.txt](runtime/WeChatAgent-LICENSE.txt). The NT database and media source subset includes [weflow-cli](https://github.com/zhuobichen/weflow-cli) code. Its [MIT notice](runtime/reader/components/weflow-cli/LICENSE) is included.
+- **Runtime binaries** in the full release include Tencent Weixin 4.1.10.27, the matching `version.dll` and the `wx_key.dll` account connection component from the matching upstream deployment. The binaries retain their respective terms.

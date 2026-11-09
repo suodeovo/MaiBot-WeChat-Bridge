@@ -2,7 +2,7 @@
 
 [项目主页](https://github.com/suodeovo/MaiBot-WeChat-Bridge) · [下载发布包](https://github.com/suodeovo/MaiBot-WeChat-Bridge/releases) · [问题反馈](https://github.com/suodeovo/MaiBot-WeChat-Bridge/issues)
 
-MaiBot 的非官方微信桥接插件，通过 WeChatAgent hook 发送消息，通过 reader SSE 接收消息。当前处于测试阶段。
+MaiBot 的非官方微信桥接插件，通过配套微信 hook 发送消息，通过 reader SSE 接收消息。当前处于测试阶段。
 
 ## 功能
 
@@ -19,31 +19,24 @@ MaiBot 的非官方微信桥接插件，通过 WeChatAgent hook 发送消息，�
 
 ```text
 接收：微信消息 → reader（SSE）→ 本插件 → MaiBot
-发送：MaiBot → 本插件 → WeChatAgent hook → 微信
+发送：MaiBot → 本插件 → 微信 hook → 微信
 ```
 
 MaiBot 主链路使用插件网关。OneBot WebSocket 服务供外部客户端连接，可通过 `server.enable` 单独开关。
 
 ## 运行环境
 
-插件 **1.4.3** 声明兼容 MaiBot **1.3.16–1.4.3**。首次安装可按 [使用说明](INSTALL.md) 下载 MaiBot、准备微信环境并测试收发。
+插件 **1.4.4** 声明兼容 MaiBot **1.3.16–1.4.3**。Windows 首次安装按 [使用说明](INSTALL.md) 下载 MaiBot、安装插件、准备微信环境和连接账号。
 
-**首次安装需要 MaiBot 和 WeChatAgent。** 完整包提供匹配的 WeChatAgent 安装器、微信客户端和 hook。详细步骤见 [运行环境安装](runtime/README.md)。
-
-| 组件 | 版本 |
+| 组件 | 要求 |
 | --- | --- |
-| 操作系统 | Windows |
-| WeChatAgent | 0.4.1，必装；完整包附安装器，内含 reader 模块和独立 Python 运行环境 |
+| 系统 | Windows x64 |
 | MaiBot | 1.3.16–1.4.3，推荐 1.4.3 |
-| maibot-plugin-sdk | 2.16.0–2.22.1，MaiBot 1.4.3 使用 2.22.1 |
-| Python | MaiBot 使用 3.12.x；reader 使用 WeChatAgent 安装器配置的独立解释器 |
-| 微信客户端 | 4.1.10.27，完整包已附带匹配客户端及 hook DLL |
+| maibot-plugin-sdk | 2.16.0–2.22.1，由 MaiBot 管理 |
+| reader Python | 64 位 Python 3.12，准备工具创建独立虚拟环境 |
+| 微信客户端 | 4.1.10.27，完整包提供匹配客户端、hook 和账号连接组件 |
 
-完整包同时附带 WeChatAgent 0.4.1 原始安装器、匹配的微信客户端及 hook 文件，存放于 `runtime/`。市场安装和源码包不携带大型二进制，可运行 `tools/download-runtime.ps1` 下载并校验匹配安装器。
-
-先安装 WeChatAgent，并在其界面完成目标机器的微信登录和数据库连接验证；账号凭据由目标机器生成，不随任何发布包分发。
-
-历史验证范围见 [版本兼容说明](docs/COMPATIBILITY.md)。
+微信桥接无需安装 WeChatAgent 桌面程序。完整包保留桥接所需的运行组件，首次连接需要在本机登录微信。 [独立运行环境](runtime/README.md) · [版本兼容说明](docs/COMPATIBILITY.md)
 
 ### 插件依赖
 
@@ -61,17 +54,14 @@ python -m pip install "websockets>=12.0" "pydantic>=2.0"
 | `pilk` | 将 PCM/WAV 音频编码为微信使用的 SILK |
 | `pycryptodome` | 图片本地降级解码 |
 
-基础消息收发无需安装语音合成插件。reader 必需 `sqlcipher3`、`cryptography`、`zstandard`、`pycryptodome`、`Pillow` 和 `imageio-ffmpeg`，由匹配安装器的独立 Python 提供，修复清单见 [reader 依赖](runtime/reader-requirements.txt)。这些包应装入 reader 的解释器环境。
+基础消息收发无需安装语音合成插件。reader 必需 `sqlcipher3`、`cryptography`、`zstandard`、`pycryptodome`、`Pillow` 和 `imageio-ffmpeg`，由准备工具按 [依赖清单](runtime/reader-requirements.txt) 安装到 reader 的独立环境。
 
 ## 安装
 
-1. 下载 MaiBot 一键启动器，安装 MaiBot 1.4.3，启动并打开 WebUI，选择要接入微信的 Bot。[下载启动器](https://github.com/Mai-with-u/MaiBotOneKey/releases) · [官方部署教程](https://docs.maibot.chat/manual/)
-2. 安装 WeChatAgent 0.4.1，打开匹配微信 4.1.10.27，完成账号连接和数据库验证。[运行环境安装](runtime/README.md)
-3. 在所选 Bot 的插件页安装，或把插件 ZIP 解压到该 Bot 的 `plugins/`。先保持插件停用。
-4. 暂停 WeChatAgent 的聊天服务和旧 reader，保留已登录微信。在插件目录运行准备工具部署补丁并配置路径。
-5. 启用插件，用另一个微信账号发一条测试消息，确认 MaiBot 收到并回复。[完整步骤](INSTALL.md)
-
-reader 补丁提供断线补收所需的游标分页接口；需在 reader 停止时部署，重新启动后生效。缺少必需文件、解释器或账号配置时，托管启动会明确报错，避免仅显示“加载成功”却不能接收。
+1. 下载并启动 MaiBot，选择目标 Bot，安装插件并暂时停用。 [MaiBot OneKey 下载](https://github.com/Mai-with-u/MaiBotOneKey/releases)
+2. 解压完整发布包，运行 `tools/setup-standalone.py` 的 `prepare` 命令。
+3. 用 `start-client` 打开配套微信，登录后用 `connect` 连接账号，再用 `chats` 选择接收会话。
+4. 启用插件，在已选会话里测试收发。 [完整安装步骤](INSTALL.md)
 
 ## 配置
 
@@ -79,8 +69,8 @@ reader 补丁提供断线补收所需的游标分页接口；需在 reader 停�
 
 | 配置项 | 说明 |
 | --- | --- |
-| `project.root` | 已安装实例的 `data/workspace`，包含全部 reader 模块 |
-| `project.python` | WeChatAgent 内置、已安装 reader 依赖的 Python；可由准备工具自动填写 |
+| `project.root` | 微信桥接运行目录，包含 reader 和本机账号配置 |
+| `project.python` | reader 的独立 Python，由准备工具填写 |
 | `reader.base_url` | reader 地址，默认 `http://127.0.0.1:5031` |
 | `hook.base_url` | hook 地址，默认 `http://127.0.0.1:30001` |
 | `wechat.whitelist_groups` | 群聊白名单，留空表示不限制 |
@@ -141,13 +131,11 @@ python -m unittest discover -s tests -v
 
 ## 发布包
 
-- **插件包**：可直接放入 MaiBot `plugins/` 的 `local_wxsupervisor/` 目录，包含插件及安装说明。
-- **源码包**：插件源码、reader 补丁、文档与测试，适合提交到 GitHub 仓库。
-- **完整包**：源码、WeChatAgent 0.4.1 原始安装器、微信 4.1.10.27 和配套 hook。运行安装器后再初始化本机账号配置。
+- **插件包**包含插件、reader 脚本和安装说明，可解压到目标 Bot 的 `plugins/`。
+- **源码包**包含源码、reader 补丁、文档和测试。
+- **完整包**另附微信 4.1.10.27、匹配 hook 和首次账号连接组件，供新环境安装。
 
-完整包不携带本机认证文件、聊天记录或生产配置。安装器和客户端较大，作为 GitHub Release 附件分发。
-
-插件市场安装的是插件源码；其中的下载和准备工具用于完成上述前置安装，不能跳过本机微信登录与账号验证。
+账号凭据和聊天数据均在目标机器本地生成。
 
 ## 来源与许可
 

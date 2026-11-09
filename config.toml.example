@@ -3,7 +3,7 @@
 # 发送走 hook 原生 HTTP（/SendTextMsg）：不模拟键盘、不抢前台、窗口可最小化。
 # 接收走 reader 的 SSE，转 OneBot v11 事件并投递给 MaiBot 网关。
 #
-# 这些字段在 MaiBot WebUI 的插件配置页里也能改，结构对齐 WeChatAgent。
+# 这些字段也可以在 MaiBot WebUI 的插件配置页修改。
 config_version = "1.0.0"
 
 [plugin]
@@ -13,16 +13,16 @@ auto_start = true
 config_version = "1.0.0"
 
 [project]
-# WeChatAgent 项目根（scripts/reader-api.py 在这里）
-root = "C:\\path\\to\\wechatagent"
+# 微信桥接运行目录（scripts/reader-api.py 在这里）
+root = "C:\\path\\to\\wechat-runtime"
 # 运行 reader-api.py 的 python
 python = "C:\\path\\to\\python\\python.exe"
 media_ttl_hours = 48.0
 media_max_mb = 512.0
 media_workers = 4
-pilk_paths = "C:\\path\\to\\wechatagent\\packages\\dsh-wechat-voice\\runtime\\py312\\Lib\\site-packages"
+pilk_paths = ""
 crypto_paths = "C:\\path\\to\\crypto\\site-packages"
-media_scripts_dir = "C:\\path\\to\\wechatagent\\scripts"
+media_scripts_dir = "C:\\path\\to\\wechat-runtime\\scripts"
 
 [reader]
 base_url = "http://127.0.0.1:5031"

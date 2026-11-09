@@ -1,4 +1,4 @@
-"""将已安装的 WeChatAgent 接到插件：默认只读检查，显式参数才修改文件。"""
+"""检查已有的 reader 运行目录，按需部署补丁和写入插件配置。"""
 from __future__ import annotations
 
 import argparse
@@ -27,14 +27,14 @@ def setup(root: Path, python: str = '', *, patch_reader=False, configure=False):
     root = root.resolve(strict=True)
     project_file = root / 'config/wechatagent.json'
     if not project_file.is_file():
-        raise RuntimeError('WECHATAGENT_NOT_CONFIGURED: 请先在 WeChatAgent 完成本机首次配置')
+        raise RuntimeError('READER_ACCOUNT_NOT_CONFIGURED: 请先完成本机微信账号连接')
     project = json.loads(project_file.read_text(encoding='utf-8-sig'))
     expected_version = project.get('hook', {}).get('expectedVersion', '4.1.10.27')
     if expected_version != '4.1.10.27':
         raise RuntimeError('WECHAT_VERSION_MISMATCH: 本版本仅验证微信 4.1.10.27，请先切换到匹配客户端')
     selected = python or str(project.get('runtime', {}).get('python') or '')
     if not selected:
-        raise RuntimeError('READER_PYTHON_MISSING: 请通过 --python 指定内置解释器')
+        raise RuntimeError('READER_PYTHON_MISSING: 请通过 --python 指定 reader 解释器')
     executable = Path(selected)
     if not executable.is_absolute():
         executable = root / executable
@@ -81,9 +81,9 @@ def setup(root: Path, python: str = '', *, patch_reader=False, configure=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='检查并配置已安装的 WeChatAgent；不执行安装器、不登录账号')
-    parser.add_argument('--project-root', type=Path, required=True, help='已安装实例的 data/workspace')
-    parser.add_argument('--python', default='', help='可选，默认读取 WeChatAgent 配置中的解释器路径')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--project-root', type=Path, required=True, help='已有的 reader 运行目录')
+    parser.add_argument('--python', default='', help='可选，默认读取现有运行配置中的解释器路径')
     parser.add_argument('--patch-reader', action='store_true', help='备份后部署本插件的游标 reader 补丁')
     parser.add_argument('--configure', action='store_true', help='备份后写入本插件的路径和连接地址')
     args = parser.parse_args()

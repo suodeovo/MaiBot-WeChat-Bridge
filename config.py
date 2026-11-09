@@ -86,19 +86,19 @@ class PluginOptions(PluginConfigBase):
 
 
 class ProjectConfig(PluginConfigBase):
-    """WeChatAgent 项目位置（reader-api.py 所在工程）。"""
+    """reader-api.py 所在的微信桥接运行目录。"""
 
     __ui_label__: ClassVar[str] = '项目与运行时'
     __ui_order__: ClassVar[int] = 1
 
     root: str = Field(
-        default=r'C:\path\to\wechatagent',
-        description='WeChatAgent 项目根目录，其下应有 scripts/reader-api.py。',
+        default=r'C:\path\to\wechat-runtime',
+        description='微信桥接运行目录，其下应有 scripts/reader-api.py。',
         json_schema_extra=_meta(
             '项目根目录', 0,
             i18n=_i18n('Project root', '项目根目录',
-                       'WeChatAgent project root containing scripts/reader-api.py.',
-                       'WeChatAgent 工程根，scripts/reader-api.py 应在其下。'),
+                       'WeChat bridge runtime directory containing scripts/reader-api.py.',
+                       '微信桥接运行目录，scripts/reader-api.py 应在其下。'),
         ),
     )
     python: str = Field(

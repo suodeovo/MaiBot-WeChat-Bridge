@@ -1,9 +1,0 @@
-{
-  "version": "0.4.1",
-  "release_url": "https://github.com/sourcepro5/WeChatAgent/releases/tag/v0.4.1",
-  "installer": "WeChatAgent-Setup-0.4.1-x64.exe",
-  "url": "https://github.com/sourcepro5/WeChatAgent/releases/download/v0.4.1/WeChatAgent-Setup-0.4.1-x64.exe",
-  "bytes": 527518846,
-  "sha256": "9acf2635a6b6c2beed2ac3a3791bd66eea00470051b2809a602908fa3de6882c",
-  "wechat_version": "4.1.10.27"
-}

@@ -38,4 +38,5 @@ tests/.pytest_cache/
 # 构建产物
 *.egg-info/
 build/
-/runtime/installers/
+/runtime/native/
+/runtime/wechat-4.1.10.27/
