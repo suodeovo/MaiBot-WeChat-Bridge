@@ -26,16 +26,16 @@ MaiBot 主链路使用插件网关。OneBot WebSocket 服务供外部客户端�
 
 ## 运行环境
 
-当前适配 MaiBot **1.3.19**，插件版本 **1.4.2**。兼容范围为 MaiBot **1.3.16–1.3.19**。
+插件 **1.4.3** 声明兼容 MaiBot **1.3.16–1.4.3**。首次安装可按 [使用说明](INSTALL.md) 下载 MaiBot、准备微信环境并测试收发。
 
-**首次安装必须先准备 WeChatAgent 运行环境。** 插件本身不能替代数据库读取器、微信 hook 和本机账号配置。1.4.2 完整包已加入匹配的 WeChatAgent 安装器，源码/市场安装提供固定版本下载脚本，见 [运行环境安装](runtime/README.md)。
+**首次安装需要 MaiBot 和 WeChatAgent。** 完整包提供匹配的 WeChatAgent 安装器、微信客户端和 hook。详细步骤见 [运行环境安装](runtime/README.md)。
 
 | 组件 | 版本 |
 | --- | --- |
 | 操作系统 | Windows |
 | WeChatAgent | 0.4.1，必装；完整包附安装器，内含 reader 模块和独立 Python 运行环境 |
-| MaiBot | 1.3.19；兼容范围 1.3.16–1.3.19 |
-| maibot-plugin-sdk | 1.3.19 配套使用 2.20.0–2.21.0；旧环境保留 2.16.0 兼容 |
+| MaiBot | 1.3.16–1.4.3，推荐 1.4.3 |
+| maibot-plugin-sdk | 2.16.0–2.22.1，MaiBot 1.4.3 使用 2.22.1 |
 | Python | MaiBot 使用 3.12.x；reader 使用 WeChatAgent 安装器配置的独立解释器 |
 | 微信客户端 | 4.1.10.27，完整包已附带匹配客户端及 hook DLL |
 
@@ -43,7 +43,7 @@ MaiBot 主链路使用插件网关。OneBot WebSocket 服务供外部客户端�
 
 先安装 WeChatAgent，并在其界面完成目标机器的微信登录和数据库连接验证；账号凭据由目标机器生成，不随任何发布包分发。
 
-1.3.19 适配验证覆盖官方清单校验、插件入口加载、组件注册及 SDK 2.20.0 / 2.21.0 隔离回归；不代表已在该版本完成真实微信收发验收。详见 [版本兼容说明](docs/COMPATIBILITY.md)。
+历史验证范围见 [版本兼容说明](docs/COMPATIBILITY.md)。
 
 ### 插件依赖
 
@@ -65,11 +65,11 @@ python -m pip install "websockets>=12.0" "pydantic>=2.0"
 
 ## 安装
 
-1. 按 [运行环境安装](runtime/README.md) 安装 WeChatAgent 0.4.1，打开匹配微信 4.1.10.27，在目标机器完成账号连接和数据库验证。
-2. 暂停 WeChatAgent 的聊天服务、旧 reader 和桥接插件，保留已登录微信；更新时先备份插件、配置及运行状态。
-3. 从插件市场安装，或将仓库内容放入 `MaiBot/plugins/local_wxsupervisor/`；该目录直接包含 `_manifest.json` 和 `plugin.py`。此时先保持插件停用。
-4. 在插件目录运行 `python tools/prepare-runtime.py --project-root "C:\WeChatAgent\data\workspace" --patch-reader --configure`，将示例路径替换为实际位置。工具先检查运行环境，再备份并部署 reader 补丁、填写插件路径；默认从 WeChatAgent 配置读取 reader 解释器。
-5. 启动或重新加载插件，检查 reader 和 hook 状态，再从外部账号验证真实收发。详细手工步骤见 [INSTALL.md](INSTALL.md)。
+1. 下载 MaiBot 一键启动器，安装 MaiBot 1.4.3，启动并打开 WebUI，选择要接入微信的 Bot。[下载启动器](https://github.com/Mai-with-u/MaiBotOneKey/releases) · [官方部署教程](https://docs.maibot.chat/manual/)
+2. 安装 WeChatAgent 0.4.1，打开匹配微信 4.1.10.27，完成账号连接和数据库验证。[运行环境安装](runtime/README.md)
+3. 在所选 Bot 的插件页安装，或把插件 ZIP 解压到该 Bot 的 `plugins/`。先保持插件停用。
+4. 暂停 WeChatAgent 的聊天服务和旧 reader，保留已登录微信。在插件目录运行准备工具部署补丁并配置路径。
+5. 启用插件，用另一个微信账号发一条测试消息，确认 MaiBot 收到并回复。[完整步骤](INSTALL.md)
 
 reader 补丁提供断线补收所需的游标分页接口；需在 reader 停止时部署，重新启动后生效。缺少必需文件、解释器或账号配置时，托管启动会明确报错，避免仅显示“加载成功”却不能接收。
 

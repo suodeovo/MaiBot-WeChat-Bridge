@@ -1,5 +1,9 @@
 # 版本兼容说明
 
+## 1.4.3
+
+插件声明兼容 MaiBot 1.3.16–1.4.3 和 SDK 2.16.0–2.22.1。MaiBot 1.4.3 的官方依赖要求 SDK 至少为 2.22.1。下方为旧版的验证记录。[MaiBot 1.4.3 依赖清单](https://github.com/Mai-with-u/MaiBot/blob/v1.4.3/pyproject.toml)
+
 ## 1.4.2
 
 - 完整包新增固定版本 WeChatAgent 0.4.1 原始安装器，SHA-256 与上游发布记录一致；源码/市场安装新增固定版本下载工具。

@@ -1,18 +1,23 @@
-# 安装、升级与回退
+# 微信桥接使用说明
 
 ## 安装
 
-1. 准备 MaiBot；按 [运行环境安装](runtime/README.md) 安装必需的 WeChatAgent 0.4.1，完成匹配微信 4.1.10.27 的登录和本机数据库验证。完整包附安装器，源码/市场安装可运行 `tools/download-runtime.ps1` 下载并校验。
-2. 若使用含客户端完整包，按 [客户端部署说明](runtime/README.md) 放置微信客户端及 hook 文件，并在目标机器初始化认证。
-3. 备份现有 reader；更新已有安装时，先暂停桥接插件和 reader，并备份插件、配置与运行状态。
-4. **先 reader，后插件**：以 `patches/reader-api.cursor-patch.py` 替换 WeChatAgent 的 `scripts/reader-api.py`，重新启动 reader。
-5. 从插件市场安装，或将仓库全部内容放入 `MaiBot/plugins/local_wxsupervisor/`；该目录下应直接存在 `_manifest.json` 和 `plugin.py`。插件专用 ZIP 已带 `local_wxsupervisor/` 外层目录，可直接解压到 `plugins/`。
-6. 可运行 `python tools/prepare-runtime.py --project-root "实际的data/workspace" --patch-reader --configure`，检查必装环境并备份后部署补丁、填写路径。手动配置时从 `config.toml.example` 复制并填写 `project.root` 和 reader 的独立解释器；更新时保留已有配置。
-7. 启动或重新加载 MaiBot，检查插件、reader 和 hook 状态。
+1. **先安装 MaiBot。** Windows 用户可下载官方 MaiBot OneKey 启动器，用它安装并启动 MaiBot 1.4.3。打开 WebUI，选择要接入微信的 Bot，配置模型供应商和聊天模型。[下载启动器](https://github.com/Mai-with-u/MaiBotOneKey/releases) · [官方部署教程](https://docs.maibot.chat/manual/)
+2. **准备微信环境。** 第一次安装可下载含 WeChatAgent 安装器的完整包。安装 WeChatAgent 0.4.1，登录微信 4.1.10.27，完成数据库连接验证。已有匹配环境可直接使用其 `data/workspace`。[插件发布页](https://github.com/suodeovo/MaiBot-WeChat-Bridge/releases/tag/v1.4.3) · [运行环境说明](runtime/README.md)
+3. **安装插件。** 在 WebUI 选中目标 Bot，再进入插件页安装。手动安装可把 `local_wxsupervisor-1.4.3.zip` 解压到该 Bot 的 `plugins/`。MaiBot 1.4.3 新建 Bot 的目录通常为 `<工作区>/bots/<bot_id>/plugins/`，原地迁移的旧 Bot 沿用原目录。确认 `local_wxsupervisor/` 下直接包含 `plugin.py` 和 `_manifest.json`。[官方实例目录说明](https://github.com/Mai-with-u/MaiBot/blob/v1.4.3/docs/multi-bot-host.md)
+4. **配置路径。** 暂停插件、WeChatAgent 聊天服务和旧 reader，保留已登录的微信。打开插件目录，将命令中的路径换成实际安装位置。准备工具会检查独立的 reader 环境、备份旧文件、部署补丁并写入插件配置。
+
+   ```powershell
+   python tools/prepare-runtime.py --project-root "C:\WeChatAgent\data\workspace" --patch-reader --configure
+   ```
+
+   若手动安装后提示插件自身缺少依赖，在该 Bot 使用的 Python 环境中运行 `python -m pip install -r requirements.txt`。
+
+5. **启用并试用。** 在插件配置中填写允许回复的私聊或群聊，再启用插件。用另一个微信账号发一条测试消息，在 WebUI 或日志确认 MaiBot 收到，回到微信确认回复送达。
 
 ## 升级
 
-- 1.4.2 补齐 WeChatAgent 安装器与运行环境准备工具；声明兼容 MaiBot 1.3.16–1.3.19，见 [兼容说明](docs/COMPATIBILITY.md)。
+- 1.4.3 的声明范围为 MaiBot 1.3.16–1.4.3。[兼容说明](docs/COMPATIBILITY.md)
 - 暂停相关服务，备份现有插件、reader、配置和运行状态。
 - 按 reader → 插件的顺序更新；客户端或 hook 有更新时，按客户端部署说明处理。
 - 保留生产配置，并核对新版本的配置要求。
